@@ -1,7 +1,9 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 morgan.token("postData", (req) => {
@@ -84,5 +86,15 @@ app.post("/api/persons", (req, res) => {
   res.json(newPerson);
 });
 
-const PORT = 3001;
-app.listen(PORT, console.log(`Server running on port ${PORT}.`));
+app.put("/api/persons/:id", (req, res) => {
+  const id = +req.params.id;
+  const newPerson = req.body;
+  newPerson.id = id;
+  persons = persons.filter((person) => person.id !== id);
+  persons = persons.concat(newPerson);
+  res.json(persons);
+});
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => `Server running on port ${PORT}.`);
