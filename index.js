@@ -3,6 +3,7 @@ import morgan from "morgan";
 import cors from "cors";
 const app = express();
 
+app.use(express.static('build'));
 app.use(cors());
 app.use(express.json());
 
