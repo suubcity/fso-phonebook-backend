@@ -69,9 +69,14 @@ app.post("/api/persons", (req, res, next) => {
   }
   const person = new Person({ name: body.name, number: body.number });
 
-  person.save().then((savedPerson) => {
-    res.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson);
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
 //delete
@@ -80,18 +85,6 @@ app.delete("/api/persons/:id", (req, res, next) => {
     .then(() => res.status(204).end())
     .catch((error) => next(error));
 });
-
-//   const note = {
-//     content: body.content,
-//     important: body.important,
-//   };
-
-//   Note.findByIdAndUpdate(request.params.id, note, { new: true })
-//     .then((updatedNote) => {
-//       response.json(updatedNote);
-//     })
-//     .catch((error) => next(error));
-// })
 
 //put
 app.put("/api/persons/", (req, res, next) => {
@@ -109,11 +102,24 @@ app.put("/api/persons/", (req, res, next) => {
 });
 
 //error handling middleware
-const errorHandler = (error, request, response, next) => {
-  console.error(error.name);
-
+const errorHandler = (error, req, res, next) => {
   if (error.name === "CastError") {
-    return response.status(400).send({ error: "malformatted id" });
+    return res.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    //logging error
+    console.log(
+      "######",
+      "VARIABLE NAME:",
+      "error",
+      "TYPEOF error:",
+      typeof error,
+      "VALUE:",
+      error,
+      "######"
+    );
+    //end of logging
+
+    return res.status(400).send(error);
   }
 
   next(error);
